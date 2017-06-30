@@ -1,14 +1,16 @@
 from lxml import html
 import requests
+from multiprocessing.dummy import Pool as ThreadPool
 
 
-START_WEB_PAGE = ''
-RELEVANT_URI = ''
+START_DOMAIN = ''   # http://example.com
+START_WEB_PAGE = '' # /path/index.html
+RELEVANT_URI = ''   # /path/
 
 
 # Get all the links on the page
 def get_all_anchors(webpage):
-    page = requests.get(webpage)
+    page = requests.get(START_DOMAIN + webpage)
     tree = html.fromstring(page.content)
     return tree.xpath('//a/@href')
 
@@ -20,10 +22,24 @@ def is_relevant_link(x):
 def filter_relevant_links(anchors):
     return filter(lambda x: is_relevant_link(x), anchors)
 
+# Gather relevant links from a relevant web page
+def gather_relevant_links(link):
+    return filter_relevant_links(get_all_anchors(link))
+
 
 # Remove all links which do not belong to the current domain
-relevantLinks = filter_relevant_links(get_all_anchors(START_WEB_PAGE))
+relevant_start_links = gather_relevant_links(START_WEB_PAGE)
 
-# Visit each link and store all links found on that web page, 
-# while keeping track of already visited links
+pool = ThreadPool(10)
 
+
+relevant_links = pool.map(gather_relevant_links, relevant_start_links)
+
+# keeping track of already visited links
+
+print "Relevant links: ", relevant_links
+
+
+# close the pool and wait for the work to finish 
+pool.close() 
+pool.join() 
