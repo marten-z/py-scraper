@@ -1,11 +1,12 @@
 from lxml import html
 import requests
 from multiprocessing.dummy import Pool as ThreadPool
+from config_local import config
 
 
-START_DOMAIN = ''   # http://example.com
-START_WEB_PAGE = '' # /path/index.html
-RELEVANT_URI = ''   # /path/
+START_DOMAIN = config["START_DOMAIN"]
+START_WEB_PAGE = config["START_WEB_PAGE"]
+RELEVANT_URI = config["RELEVANT_URI"]
 
 
 # Get all the links on the page
