@@ -33,7 +33,10 @@ def gather_relevant_links(link):
         # print "Gathering relevant links for link:", link
         relevant_links = filter_relevant_links(get_all_anchors(link))
         visited_links.append(link)
-        found_links.append(relevant_links)
+        
+        for relevant_link in relevant_links:
+            found_links.append(relevant_link)
+        
         return relevant_links
     # print "Link %s has already been visited, skipping..." % link
     return []
@@ -58,11 +61,16 @@ print "Started gathering links from %d start links" % len(relevant_start_links)
 pool = ThreadPool(8)
 pool.map(gather_relevant_links_recursively, relevant_start_links)
 
-# close the pool and wait for the work to finish 
+# Close the pool and wait for the work to finish 
 pool.close() 
 pool.join() 
 
 filtered_found_links = filter_found_links(found_links)
 
-#print "Found %d links: %s" % (len(found_links), found_links)
-print "Found %d links" % len(found_links)
+#print "Found %d links: %s" % (len(filtered_found_links), filtered_found_links)
+print "Found %d links in total" % len(filtered_found_links)
+
+# Write found links to a file
+file = open('test.txt', 'w')
+for link in filtered_found_links:
+    print>>file, link
