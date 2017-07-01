@@ -35,7 +35,8 @@ def gather_relevant_links(link):
         visited_links.append(link)
         
         for relevant_link in relevant_links:
-            found_links.append(relevant_link)
+            if relevant_link not in found_links:
+                found_links.append(relevant_link)
         
         return relevant_links
     # print "Link %s has already been visited, skipping..." % link
