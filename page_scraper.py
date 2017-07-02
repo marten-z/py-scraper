@@ -1,6 +1,7 @@
 from lxml import html
 import requests
 from multiprocessing.dummy import Pool as ThreadPool
+import json
 from config_local import config
 
 
@@ -8,16 +9,30 @@ START_DOMAIN = config["START_DOMAIN"]
 LINKS_FILE =  config["LINKS_FILE"]
 
 
+entities = []
+
+
+def read_data(trs):
+    entity = {}
+    current_category = "unknown"
+    entity[current_category] = []
+    for tr in trs:
+        tds = tr.xpath("td")
+        length = len(tds)
+        if length == 1: # Category
+            current_category = tds[0].text_content()
+            entity[current_category] = []
+        elif length == 2: # Data belonging to current category
+            entity[current_category].append({tds[0].text_content(): tds[1].text_content()})
+    entities.append(entity)
+
 def scrape_page(path):
     page = requests.get(START_DOMAIN + path)
     tree = html.fromstring(page.content)
     infobox = tree.xpath("//table[@class='infobox']")
     if infobox[0] is not None:
         trs = infobox[0].xpath("tr")
-        for tr in trs:
-            tds = tr.xpath("td")
-            for td in tds:
-                print "TD: ", td.text_content()
+        read_data(trs)
 
 
 # Get links from a file
@@ -33,3 +48,5 @@ pool.map(scrape_page, paths)
 # Close the pool and wait for the work to finish 
 pool.close() 
 pool.join() 
+
+print "Entities: ", json.dumps(entities)
