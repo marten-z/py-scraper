@@ -2,6 +2,7 @@ from lxml import html
 import requests
 from multiprocessing.dummy import Pool as ThreadPool
 import json
+import threading
 from config_local import config
 
 
@@ -11,7 +12,12 @@ ENTITIES_FILE = config["ENTITIES_FILE"]
 
 
 entities = []
+lock = threading.Lock()
 
+
+def append_entity(e):
+    with lock:
+        entities.append(e)
 
 def clean_up(text):
     return text.replace(u"\u00A0", " ").strip()
@@ -30,13 +36,13 @@ def read_data(path, trs):
                 entity[current_category] = []
         elif length == 2: # Data belonging to current category
             entity[current_category].append({clean_up(tds[0].text_content()): clean_up(tds[1].text_content())})
-    entities.append(entity)
+    append_entity(entity)
 
 def scrape_page(path):
     page = requests.get(START_DOMAIN + path)
     tree = html.fromstring(page.content)
     infobox = tree.xpath("//table[@class='infobox']")
-    if infobox[0] is not None:
+    if infobox and infobox[0] is not None:
         trs = infobox[0].xpath("tr")
         read_data(path, trs)
 
@@ -46,7 +52,7 @@ with open(LINKS_FILE) as f:
     paths = f.readlines()
 
 # Remove whitespace characters like `\n` at the end of each line
-paths = [x.strip() for x in paths] 
+paths = [x.strip() for x in paths]
 
 pool = ThreadPool(8)
 pool.map(scrape_page, paths)
