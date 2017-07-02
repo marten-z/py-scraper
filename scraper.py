@@ -7,6 +7,7 @@ from config_local import config
 START_DOMAIN = config["START_DOMAIN"]
 START_WEB_PAGE = config["START_WEB_PAGE"]
 RELEVANT_URI = config["RELEVANT_URI"]
+OUTPUT_FILE =  config["OUTPUT_FILE"]
 
 
 found_links = []
@@ -48,7 +49,7 @@ def gather_relevant_links_recursively(link):
         gather_relevant_links(relevant_link)
 
 def is_interesting_found_link(link):
-    return ":" not in link
+    return ":" not in link and "#" not in link
 
 def filter_found_links(found_links):
     return filter(lambda x: is_interesting_found_link(x), found_links)
@@ -72,6 +73,6 @@ filtered_found_links = filter_found_links(found_links)
 print "Found %d links in total" % len(filtered_found_links)
 
 # Write found links to a file
-file = open('test.txt', 'w')
+file = open(OUTPUT_FILE, 'w')
 for link in filtered_found_links:
     print>>file, link
