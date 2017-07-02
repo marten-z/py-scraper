@@ -6,7 +6,8 @@ from config_local import config
 
 
 START_DOMAIN = config["START_DOMAIN"]
-LINKS_FILE =  config["LINKS_FILE"]
+LINKS_FILE = config["LINKS_FILE"]
+ENTITIES_FILE = config["ENTITIES_FILE"] 
 
 
 entities = []
@@ -53,4 +54,7 @@ pool.map(scrape_page, paths)
 pool.close() 
 pool.join() 
 
-print "Entities: ", json.dumps(entities)
+#print "Entities: ", json.dumps(entities)
+
+file=open(ENTITIES_FILE, 'w+')
+file.write(json.dumps(entities))
