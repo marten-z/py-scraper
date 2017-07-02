@@ -7,7 +7,7 @@ from config_local import config
 START_DOMAIN = config["START_DOMAIN"]
 START_WEB_PAGE = config["START_WEB_PAGE"]
 RELEVANT_URI = config["RELEVANT_URI"]
-OUTPUT_FILE =  config["OUTPUT_FILE"]
+LINKS_FILE =  config["LINKS_FILE"]
 
 
 found_links = []
@@ -15,8 +15,8 @@ visited_links = []
 
 
 # Get all the links on the page
-def get_all_anchors(webpage):
-    page = requests.get(START_DOMAIN + webpage)
+def get_all_anchors(path):
+    page = requests.get(START_DOMAIN + path)
     tree = html.fromstring(page.content)
     return tree.xpath('//a/@href')
 
@@ -73,6 +73,6 @@ filtered_found_links = filter_found_links(found_links)
 print "Found %d links in total" % len(filtered_found_links)
 
 # Write found links to a file
-file = open(OUTPUT_FILE, 'w')
+file = open(LINKS_FILE, 'w')
 for link in filtered_found_links:
     print>>file, link
