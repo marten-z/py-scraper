@@ -19,6 +19,7 @@ def clean_up(text):
 def read_data(path, trs):
     entity = {'path': path}
     current_category = path
+    entity[current_category] = []
     for tr in trs:
         tds = tr.xpath("td")
         length = len(tds)
