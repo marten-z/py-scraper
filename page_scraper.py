@@ -12,18 +12,22 @@ LINKS_FILE =  config["LINKS_FILE"]
 entities = []
 
 
-def read_data(trs):
-    entity = {}
-    current_category = "unknown"
-    entity[current_category] = []
+def clean_up(text):
+    return text.replace(u"\u00A0", " ").strip()
+
+def read_data(path, trs):
+    entity = {'path': path}
+    current_category = path
     for tr in trs:
         tds = tr.xpath("td")
         length = len(tds)
         if length == 1: # Category
-            current_category = tds[0].text_content()
-            entity[current_category] = []
+            temp_cat = clean_up(tds[0].text_content())
+            if temp_cat:
+                current_category = temp_cat
+                entity[current_category] = []
         elif length == 2: # Data belonging to current category
-            entity[current_category].append({tds[0].text_content(): tds[1].text_content()})
+            entity[current_category].append({clean_up(tds[0].text_content()): clean_up(tds[1].text_content())})
     entities.append(entity)
 
 def scrape_page(path):
@@ -32,7 +36,7 @@ def scrape_page(path):
     infobox = tree.xpath("//table[@class='infobox']")
     if infobox[0] is not None:
         trs = infobox[0].xpath("tr")
-        read_data(trs)
+        read_data(path, trs)
 
 
 # Get links from a file
