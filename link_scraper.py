@@ -4,6 +4,8 @@ from multiprocessing.dummy import Pool as ThreadPool
 from config_local import config
 
 
+MAX_THREADS = 2
+
 START_DOMAIN = config["START_DOMAIN"]
 START_WEB_PAGE = config["START_WEB_PAGE"]
 RELEVANT_URI = config["RELEVANT_URI"]
@@ -12,6 +14,7 @@ LINKS_FILE =  config["LINKS_FILE"]
 
 found_links = []
 visited_links = []
+current_connections = 0
 
 
 # Get all the links on the page
@@ -60,7 +63,7 @@ relevant_start_links = gather_relevant_links(START_WEB_PAGE)
 
 print "Started gathering links from %d start links" % len(relevant_start_links)
 
-pool = ThreadPool(8)
+pool = ThreadPool(MAX_THREADS)
 pool.map(gather_relevant_links_recursively, relevant_start_links)
 
 # Close the pool and wait for the work to finish 

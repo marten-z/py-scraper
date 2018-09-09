@@ -6,6 +6,8 @@ import threading
 from config_local import config
 
 
+MAX_THREADS = 2
+
 START_DOMAIN = config["START_DOMAIN"]
 LINKS_FILE = config["LINKS_FILE"]
 ENTITIES_FILE = config["ENTITIES_FILE"] 
@@ -23,6 +25,7 @@ def clean_up(text):
     return text.replace(u"\u00A0", " ").strip()
 
 def read_data(path, trs):
+    print "Reading path", path
     entity = {'path': path}
     current_category = path
     entity[current_category] = []
@@ -54,7 +57,7 @@ with open(LINKS_FILE) as f:
 # Remove whitespace characters like `\n` at the end of each line
 paths = [x.strip() for x in paths]
 
-pool = ThreadPool(8)
+pool = ThreadPool(MAX_THREADS)
 pool.map(scrape_page, paths)
 
 # Close the pool and wait for the work to finish 
